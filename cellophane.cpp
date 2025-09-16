@@ -199,7 +199,7 @@ class CellophaneUI : public Fl_Window {
 
   void centerWindowOnScreen() {
     int X, Y, W, H;
-    Fl::screen_work_area(X, Y, W, H);
+    Fl::screen_xywh(X, Y, W, H);
     int winW = w();
     int winH = h();
 

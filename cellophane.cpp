@@ -197,6 +197,15 @@ class CellophaneUI : public Fl_Window {
     }
   }
 
+  void centerWindowOnScreen() {
+    int X, Y, W, H;
+    Fl::screen_work_area(X, Y, W, H);
+    int winW = w();
+    int winH = h();
+
+    position(X + (W - winW) / 2, Y + (H - winH) / 2);
+  }
+
 public:
   CellophaneUI() : Fl_Window(400, 0, "Cellophane") {
     begin();
@@ -230,6 +239,8 @@ public:
 
     loadConfig();
     syncWidgets();
+
+    centerWindowOnScreen();
   }
 
   int handle(int ev) override {

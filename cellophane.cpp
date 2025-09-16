@@ -150,11 +150,15 @@ class CellophaneUI : public Fl_Window {
       }
     }
 
-    if (std::getline(F, Line))
-      sscanf(Line.c_str(), "x=%d,y=%d", &OffsetX, &OffsetY);
-
-    if (std::getline(F, Line))
-      ColourHex = Line;
+    if (std::getline(F, Line)) {
+      if (Line[0] == 'x') {
+        sscanf(Line.c_str(), "x=%d,y=%d", &OffsetX, &OffsetY);
+        if (std::getline(F, Line))
+          ColourHex = Line;
+      } else {
+        ColourHex = Line;
+      }
+    }
   }
 
   void syncWidgets() {

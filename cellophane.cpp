@@ -12,6 +12,7 @@
 #include <cassert>
 #include <cstdio>
 #include <fstream>
+#include <regex>
 #include <spawn.h>
 #include <string>
 #include <sys/wait.h>
@@ -97,6 +98,16 @@ class CellophaneUI : public Fl_Window {
   Fl_Value_Input *XInput;
   Fl_Value_Input *YInput;
   ColorPreview *ColorPreview_;
+
+  static std::string decodeURI(const std::string &Uri) {
+    std::regex re("^file://+");
+    std::string stripped = std::regex_replace(Uri, re, "/");
+    char *dec = g_uri_unescape_string(stripped.c_str(), nullptr);
+    std::string out = dec ? dec : "";
+    if (dec)
+      g_free(dec);
+    return out;
+  }
 
   static void cbBrowse(Fl_Widget *, void *Data) {
     auto *UI = static_cast<CellophaneUI *>(Data);
@@ -219,6 +230,23 @@ public:
 
     loadConfig();
     syncWidgets();
+  }
+
+  int handle(int ev) override {
+    if (ev == FL_DND_ENTER || ev == FL_DND_DRAG || ev == FL_DND_RELEASE)
+      return 1;
+    if (ev == FL_PASTE) {
+      std::string text = Fl::event_text();
+      while (!text.empty() && std::isspace(text.back()))
+        text.pop_back();
+      std::string path = decodeURI(text);
+      if (!path.empty()) {
+        ImagePath = path;
+        ImageInput->value(ImagePath.c_str());
+      }
+      return 1;
+    }
+    return Fl_Window::handle(ev);
   }
 };
 
